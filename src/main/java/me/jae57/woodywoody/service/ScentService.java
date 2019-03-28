@@ -7,9 +7,14 @@ import java.util.List;
 
 public interface ScentService {
     void addScent(ReqScentDto reqScentDto);
+
     List<ScentDto> getAllScents();
+
     ScentDto getScent(Long scentId);
-    //List<ScentDto> getScentsByFamily(int familyId);
+
+    List<ScentDto> getScentsByFamily(int familyId);
+
     void updateScent(Long scentId, ReqScentDto reqScentDto);
+
     void deleteScent(Long scentId);
 }

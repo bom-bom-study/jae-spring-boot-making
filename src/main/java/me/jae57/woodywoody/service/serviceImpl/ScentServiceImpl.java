@@ -35,9 +35,9 @@ public class ScentServiceImpl implements ScentService {
     @Override
     public void addScent(ReqScentDto reqScentDto) {
         int stored = scentRepository.getScentByName(reqScentDto.getScentName());
-        if(stored > 0){
+        if (stored > 0) {
 
-        }else{
+        } else {
             int result = scentRepository.addScent(Scent
                     .builder()
                     .scentName(reqScentDto.getScentName())
@@ -45,15 +45,15 @@ public class ScentServiceImpl implements ScentService {
                     .brand(reqScentDto.getBrand())
                     .fragrance(reqScentDto.getFragrance())
                     .build());
-            if(result ==0){
+            if (result == 0) {
 
-            }else{
+            } else {
                 List<String> families = reqScentDto.getFamilies();
                 Long scentId = scentRepository.getScentId(reqScentDto.getScentName());
-                for(String familyName : families){
+                for (String familyName : families) {
                     int familyId = familyRepository.getFamilyId(familyName);
                     int mappingResult = scentFamilyRepository.addScentFamily(scentId, familyId);
-                    if(mappingResult == 0){
+                    if (mappingResult == 0) {
 
                     }
                 }
@@ -64,7 +64,7 @@ public class ScentServiceImpl implements ScentService {
     @Override
     public List<ScentDto> getAllScents() {
         List<Scent> scents = scentRepository.getAllScents();
-        return scents.stream().map(scent-> {
+        return scents.stream().map(scent -> {
             Long scentId = scent.getScentId();
             return getScent(scentId);
         }).collect(Collectors.toList());
@@ -81,20 +81,31 @@ public class ScentServiceImpl implements ScentService {
 
     @Transactional
     @Override
+    public List<ScentDto> getScentsByFamily(int familyId) {
+        int scentCount = scentFamilyRepository.getCountByFamilyId(familyId);
+        if (scentCount == 0) {
+            // exception
+        }
+        List<Long> scentIds = scentFamilyRepository.getScentsByFamilyId(familyId);
+        return scentIds.stream().map(this::getScent).collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
     public void updateScent(Long scentId, ReqScentDto reqScentDto) {
         Set<Integer> oldFamilies = new HashSet<>(scentFamilyRepository.getFamiliesByScentId(scentId));
         Set<Integer> newFamilyIds = familyNamesToIds(reqScentDto.getFamilies());
-        if(oldFamilies.equals(newFamilyIds)){
+        if (oldFamilies.equals(newFamilyIds)) {
 
-        }else{
+        } else {
             scentFamilyRepository.deleteAllByScentId(scentId);
             int result = scentFamilyRepository.getCountByScentId(scentId);
-            if(result ==0){
-                for(Integer familyId : newFamilyIds){
-                    scentFamilyRepository.addScentFamily(scentId,familyId);
+            if (result == 0) {
+                for (Integer familyId : newFamilyIds) {
+                    scentFamilyRepository.addScentFamily(scentId, familyId);
                 }
-            }else{
-                //exception 다 안지워짐
+            } else {
+                //exception
             }
         }
 
@@ -115,7 +126,7 @@ public class ScentServiceImpl implements ScentService {
     public void deleteScent(Long scentId) {
         scentFamilyRepository.deleteAllByScentId(scentId);
         int stored = scentFamilyRepository.getCountByScentId(scentId);
-        if(stored != 0){
+        if (stored != 0) {
             // exception
         }
         int result = scentRepository.deleteScent(scentId);
@@ -124,7 +135,7 @@ public class ScentServiceImpl implements ScentService {
         }
     }
 
-    private Set<Integer> familyNamesToIds(List<String> families){
+    private Set<Integer> familyNamesToIds(List<String> families) {
         return families.stream().map(familyRepository::getFamilyId).collect(Collectors.toSet());
     }
 

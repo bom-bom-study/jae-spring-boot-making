@@ -14,16 +14,18 @@ public class ScentDto {
     private String fragrance;
     private List<String> families;
 
-    private ScentDto(Scent scent, List<Family> families){
+    private ScentDto(Scent scent, List<Family> families) {
         this.scentId = scent.getScentId();
         this.scentName = scent.getScentName();
         this.scentKorName = scent.getScentKorName();
         this.brand = scent.getBrand();
         this.fragrance = scent.getFragrance();
-        this.families = families.stream().map(Family::getFamilyName).collect(Collectors.toList());
+        this.families = families.stream()
+                .map(Family::getFamilyName)
+                .collect(Collectors.toList());
     }
 
-    public static ScentDto from(Scent scent, List<Family> families){
+    public static ScentDto from(Scent scent, List<Family> families) {
         return new ScentDto(scent, families);
     }
 }

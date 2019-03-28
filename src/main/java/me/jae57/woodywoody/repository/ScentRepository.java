@@ -26,20 +26,20 @@ public class ScentRepository {
                 .build());
     }
 
-    public Scent getScent(Long scentId){
+    public Scent getScent(Long scentId) {
         String query = "SELECT * FROM scent WHERE scent_id=?";
-        return jdbcTemplate.queryForObject(query, (result,rowNum)-> Scent
-                .builder()
-                .scentId(result.getLong("scent_id"))
-                .scentName(result.getString("scent_name"))
-                .scentKorName(result.getString("scent_kor_name"))
-                .brand(result.getString("brand"))
-                .fragrance(result.getString("fragrance"))
-                .build()
-                ,scentId);
+        return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
+                        .builder()
+                        .scentId(result.getLong("scent_id"))
+                        .scentName(result.getString("scent_name"))
+                        .scentKorName(result.getString("scent_kor_name"))
+                        .brand(result.getString("brand"))
+                        .fragrance(result.getString("fragrance"))
+                        .build()
+                , scentId);
     }
 
-    public int getScentByName(String scentName){
+    public int getScentByName(String scentName) {
         String query = "SELECT count(*) FROM scent WHERE scent_name=?";
         return jdbcTemplate.queryForObject(query, int.class, scentName);
     }
@@ -65,7 +65,7 @@ public class ScentRepository {
                 scent.getScentKorName(),
                 scent.getBrand(),
                 scent.getFragrance()
-                ,scentId);
+                , scentId);
     }
 
     public int deleteScent(Long scentId) {
