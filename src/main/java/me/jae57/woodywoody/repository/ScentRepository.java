@@ -18,7 +18,7 @@ public class ScentRepository {
     public List<Scent> getAllScents() {
         return jdbcTemplate.query("select * from scent", (result, rowNum) -> Scent
                 .builder()
-                .scentId(result.getInt("scent_id"))
+                .scentId(result.getLong("scent_id"))
                 .scentName(result.getString("scent_name"))
                 .scentKorName(result.getString("scent_kor_name"))
                 .brand(result.getString("brand"))
@@ -26,11 +26,11 @@ public class ScentRepository {
                 .build());
     }
 
-    public Scent getScent(int scentId){
+    public Scent getScent(Long scentId){
         String query = "SELECT * FROM scent WHERE scent_id=?";
         return jdbcTemplate.queryForObject(query, (result,rowNum)-> Scent
                 .builder()
-                .scentId(result.getInt("scent_id"))
+                .scentId(result.getLong("scent_id"))
                 .scentName(result.getString("scent_name"))
                 .scentKorName(result.getString("scent_kor_name"))
                 .brand(result.getString("brand"))
@@ -39,12 +39,15 @@ public class ScentRepository {
                 ,scentId);
     }
 
-    public int getScentId(String scentName) {
-        String query = "SELECT scent_id FROM scent WHERE scent_name=?";
+    public int getScentByName(String scentName){
+        String query = "SELECT count(*) FROM scent WHERE scent_name=?";
         return jdbcTemplate.queryForObject(query, int.class, scentName);
     }
 
-
+    public Long getScentId(String scentName) {
+        String query = "SELECT scent_id FROM scent WHERE scent_name=?";
+        return jdbcTemplate.queryForObject(query, long.class, scentName);
+    }
 
     public int addScent(Scent scent) {
         String query = "INSERT INTO scent(scent_name, scent_kor_name, brand, fragrance ) VALUES(?,?,?,?)";
@@ -55,7 +58,7 @@ public class ScentRepository {
                 scent.getFragrance());
     }
 
-    public int updateScent(int scentId, Scent scent) {
+    public int updateScent(Long scentId, Scent scent) {
         String query = "UPDATE scent SET scent_name=?,scent_kor_name=?,brand=?,fragrance=? WHERE scent_id=?";
         return jdbcTemplate.update(query,
                 scent.getScentName(),
@@ -65,7 +68,7 @@ public class ScentRepository {
                 ,scentId);
     }
 
-    public int deleteScent(int scentId) {
+    public int deleteScent(Long scentId) {
         String query = "DELETE FROM scent WHERE scent_id=?";
         return jdbcTemplate.update(query, scentId);
     }

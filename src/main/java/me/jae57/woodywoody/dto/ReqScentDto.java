@@ -10,4 +10,5 @@ public class ReqScentDto {
     private String scentKorName;
     private String brand;
     private String fragrance;
+    private List<String> families;
 }
