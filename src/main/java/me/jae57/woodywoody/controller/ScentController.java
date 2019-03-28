@@ -1,5 +1,8 @@
 package me.jae57.woodywoody.controller;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import me.jae57.woodywoody.dto.ReqScentDto;
 import me.jae57.woodywoody.dto.ScentDto;
 import me.jae57.woodywoody.service.ScentService;
@@ -19,33 +22,43 @@ public class ScentController {
         this.scentService = scentService;
     }
 
+    @ApiOperation(value = "scent 등록")
     @PostMapping
     public ResponseEntity<String> addScent(@RequestBody ReqScentDto reqScentDto) {
         scentService.addScent(reqScentDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @ApiOperation(value = "전체 scent 조회")
     @GetMapping
     public ResponseEntity<List<ScentDto>> getAllScents() {
         return ResponseEntity.status(HttpStatus.OK).body(scentService.getAllScents());
     }
 
+    @ApiOperation(value = "id로 scent 조회")
+    @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @GetMapping("/{scent-id}")
     public ResponseEntity<ScentDto> getScent(@PathVariable("scent-id") Long scentId) {
         return ResponseEntity.status(HttpStatus.OK).body(scentService.getScent(scentId));
     }
 
+    @ApiOperation(value = "특정 family에 해당하는 scent 조회")
+    @ApiImplicitParams({@ApiImplicitParam(name = "family-id", value = "계열 고유번호", required = true)})
     @GetMapping("/families/{family-id}")
     public ResponseEntity<List<ScentDto>> getScentsByFamily(@PathVariable("family-id") int familyId) {
         return ResponseEntity.status(HttpStatus.OK).body(scentService.getScentsByFamily(familyId));
     }
 
+    @ApiOperation(value = "scent 수정")
+    @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @PatchMapping("/{scent-id}")
     public ResponseEntity<Void> updateScent(@RequestParam("scent-id") Long scentId, @ModelAttribute ReqScentDto reqScentDto) {
         scentService.updateScent(scentId, reqScentDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @ApiOperation(value = "scent 삭제")
+    @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @DeleteMapping("/{scent-id}")
     public ResponseEntity deleteScent(@RequestParam("scent-id") Long scentId) {
         scentService.deleteScent(scentId);

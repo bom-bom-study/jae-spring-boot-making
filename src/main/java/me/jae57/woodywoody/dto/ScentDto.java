@@ -1,11 +1,15 @@
 package me.jae57.woodywoody.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.jae57.woodywoody.model.Family;
 import me.jae57.woodywoody.model.Scent;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Setter
+@Getter
 public class ScentDto {
     private Long scentId;
     private String scentName;
