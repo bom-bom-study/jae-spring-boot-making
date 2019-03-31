@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
     @Bean
-    public Docket api(){
+    public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("")
                 .apiInfo(apiInfo())
@@ -26,7 +26,7 @@ public class SwaggerConfig {
                 .useDefaultResponseMessages(false);
     }
 
-    private ApiInfo apiInfo(){
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("WOODYWOODY")
                 .description("Perfume API")

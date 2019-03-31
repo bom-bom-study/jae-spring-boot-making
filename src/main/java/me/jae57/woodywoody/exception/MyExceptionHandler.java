@@ -1,4 +1,4 @@
-package me.jae57.woodywoody.controller;
+package me.jae57.woodywoody.exception;
 
 import me.jae57.woodywoody.exception.DuplicateScentIdException;
 import me.jae57.woodywoody.exception.EmptyDataException;
@@ -18,8 +18,8 @@ public class MyExceptionHandler {
 
     @ExceptionHandler({ScentNotFoundException.class, FamilyNotFoundException.class, EmptyDataException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity notFound(RuntimeException re){
-        ErrorDetail errorDetail= new ErrorDetail();
+    public ResponseEntity notFound(RuntimeException re) {
+        ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
         errorDetail.setCode(1002);
         errorDetail.setMessage(re.getMessage());
@@ -28,8 +28,8 @@ public class MyExceptionHandler {
 
     @ExceptionHandler(DuplicateScentIdException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity duplicate(RuntimeException re){
-        ErrorDetail errorDetail= new ErrorDetail();
+    public ResponseEntity duplicate(RuntimeException re) {
+        ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
         errorDetail.setCode(1002);
         errorDetail.setMessage(re.getMessage());

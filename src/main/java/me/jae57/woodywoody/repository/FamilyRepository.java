@@ -21,7 +21,7 @@ public class FamilyRepository {
         String query = "SELECT family_id FROM family WHERE family_name=?";
         try {
             return jdbcTemplate.queryForObject(query, int.class, familyName);
-        }catch(EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new FamilyNotFoundException("family not found");
         }
     }
@@ -38,9 +38,9 @@ public class FamilyRepository {
                 , familyId);
     }
 
-    public int getCountByFamilyId(int familyId){
+    public int getCountByFamilyId(int familyId) {
         String query = "SELECT count(*) FROM family WHERE family_id=?";
-        return jdbcTemplate.queryForObject(query,int.class,familyId);
+        return jdbcTemplate.queryForObject(query, int.class, familyId);
     }
 
 }

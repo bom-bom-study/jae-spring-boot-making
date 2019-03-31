@@ -26,7 +26,7 @@ public class ScentController {
 
     @ApiOperation(value = "scent 등록")
     @PostMapping
-    public ResponseEntity<String> addScent(@Validated @RequestBody ReqScentDto reqScentDto) {
+    public ResponseEntity<Void> addScent(@Validated @RequestBody ReqScentDto reqScentDto) {
         scentService.addScent(reqScentDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -65,7 +65,7 @@ public class ScentController {
     @ApiOperation(value = "scent 삭제")
     @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @DeleteMapping("/{scent-id}")
-    public ResponseEntity deleteScent(@PathVariable("scent-id") Long scentId) {
+    public ResponseEntity<Void> deleteScent(@PathVariable("scent-id") Long scentId) {
         scentService.deleteScent(scentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

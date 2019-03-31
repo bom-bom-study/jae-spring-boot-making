@@ -40,7 +40,7 @@ public class ScentRepository {
                             .fragrance(result.getString("fragrance"))
                             .build()
                     , scentId);
-        }catch(EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new ScentNotFoundException("scent not found");
         }
     }
