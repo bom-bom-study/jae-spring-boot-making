@@ -2,6 +2,8 @@ package me.jae57.woodywoody.service.serviceImpl;
 
 import me.jae57.woodywoody.dto.ReqScentDto;
 import me.jae57.woodywoody.dto.ScentDto;
+import me.jae57.woodywoody.exception.DuplicateScentIdException;
+import me.jae57.woodywoody.exception.ScentNotFoundException;
 import me.jae57.woodywoody.model.Family;
 import me.jae57.woodywoody.model.Scent;
 import me.jae57.woodywoody.repository.FamilyRepository;
@@ -36,7 +38,7 @@ public class ScentServiceImpl implements ScentService {
     public void addScent(ReqScentDto reqScentDto) {
         int stored = scentRepository.getScentByName(reqScentDto.getScentName());
         if (stored > 0) {
-
+            throw new DuplicateScentIdException("The scent already exists : "+reqScentDto.getScentName());
         } else {
             int result = scentRepository.addScent(Scent
                     .builder()
@@ -93,11 +95,14 @@ public class ScentServiceImpl implements ScentService {
     @Transactional
     @Override
     public void updateScent(Long scentId, ReqScentDto reqScentDto) {
+        int stored = scentFamilyRepository.getCountByScentId(scentId);
+        if( stored == 0){
+            throw new ScentNotFoundException("scent not found");
+        }
+
         Set<Integer> oldFamilies = new HashSet<>(scentFamilyRepository.getFamiliesByScentId(scentId));
         Set<Integer> newFamilyIds = familyNamesToIds(reqScentDto.getFamilies());
-        if (oldFamilies.equals(newFamilyIds)) {
-
-        } else {
+        if (!oldFamilies.equals(newFamilyIds)) {
             scentFamilyRepository.deleteAllByScentId(scentId);
             int result = scentFamilyRepository.getCountByScentId(scentId);
             if (result == 0) {
@@ -124,8 +129,13 @@ public class ScentServiceImpl implements ScentService {
     @Transactional
     @Override
     public void deleteScent(Long scentId) {
-        scentFamilyRepository.deleteAllByScentId(scentId);
         int stored = scentFamilyRepository.getCountByScentId(scentId);
+        if( stored == 0){
+            throw new ScentNotFoundException("scent not found");
+        }
+
+        scentFamilyRepository.deleteAllByScentId(scentId);
+        stored = scentFamilyRepository.getCountByScentId(scentId);
         if (stored != 0) {
             // exception
         }
