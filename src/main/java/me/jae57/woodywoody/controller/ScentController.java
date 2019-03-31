@@ -35,10 +35,7 @@ public class ScentController {
     @GetMapping
     public ResponseEntity<List<ScentDto>> getAllScents() {
         List<ScentDto> scents = scentService.getAllScents();
-        if(scents == null){
-            throw new ScentNotFoundException("There is no scent.");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(scentService.getAllScents());
+        return ResponseEntity.status(HttpStatus.OK).body(scents);
     }
 
     @ApiOperation(value = "id로 scent 조회")
@@ -46,9 +43,6 @@ public class ScentController {
     @GetMapping("/{scent-id}")
     public ResponseEntity<ScentDto> getScent(@PathVariable("scent-id") Long scentId) {
         ScentDto scent = scentService.getScent(scentId);
-        if(scent == null){
-            throw new ScentNotFoundException("scent not found");
-        }
         return ResponseEntity.status(HttpStatus.OK).body(scent);
     }
 
@@ -57,16 +51,13 @@ public class ScentController {
     @GetMapping("/families/{family-id}")
     public ResponseEntity<List<ScentDto>> getScentsByFamily(@PathVariable("family-id") int familyId) {
         List<ScentDto> scentsByFamily = scentService.getScentsByFamily(familyId);
-        if(scentsByFamily == null){
-            throw new ScentNotFoundException("There is no scent with family-id("+familyId+")");
-        }
         return ResponseEntity.status(HttpStatus.OK).body(scentsByFamily);
     }
 
     @ApiOperation(value = "scent 수정")
     @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @PatchMapping("/{scent-id}")
-    public ResponseEntity<Void> updateScent(@RequestParam("scent-id") Long scentId, @ModelAttribute ReqScentDto reqScentDto) {
+    public ResponseEntity<Void> updateScent(@PathVariable("scent-id") Long scentId, @RequestBody ReqScentDto reqScentDto) {
         scentService.updateScent(scentId, reqScentDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -74,7 +65,7 @@ public class ScentController {
     @ApiOperation(value = "scent 삭제")
     @ApiImplicitParams({@ApiImplicitParam(name = "scent-id", value = "향 고유번호", required = true)})
     @DeleteMapping("/{scent-id}")
-    public ResponseEntity deleteScent(@RequestParam("scent-id") Long scentId) {
+    public ResponseEntity deleteScent(@PathVariable("scent-id") Long scentId) {
         scentService.deleteScent(scentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -11,7 +11,6 @@ import java.util.Date;
 public class ErrorDetail {
     private String message;
     private int code;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone= "Asia/Seoul")
     private Date timeStamp;
 }

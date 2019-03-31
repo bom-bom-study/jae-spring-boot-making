@@ -1,6 +1,8 @@
 package me.jae57.woodywoody.controller;
 
 import me.jae57.woodywoody.exception.DuplicateScentIdException;
+import me.jae57.woodywoody.exception.EmptyDataException;
+import me.jae57.woodywoody.exception.FamilyNotFoundException;
 import me.jae57.woodywoody.exception.ScentNotFoundException;
 import me.jae57.woodywoody.model.ErrorDetail;
 import org.springframework.http.HttpStatus;
@@ -14,23 +16,23 @@ import java.util.Date;
 @ControllerAdvice
 public class MyExceptionHandler {
 
-    @ExceptionHandler(ScentNotFoundException.class)
+    @ExceptionHandler({ScentNotFoundException.class, FamilyNotFoundException.class, EmptyDataException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity handlerScentNotFoundException(ScentNotFoundException snfe){
-        ErrorDetail errorDetail = new ErrorDetail();
+    public ResponseEntity notFound(RuntimeException re){
+        ErrorDetail errorDetail= new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
         errorDetail.setCode(1002);
-        errorDetail.setMessage(snfe.getMessage());
+        errorDetail.setMessage(re.getMessage());
         return new ResponseEntity(errorDetail, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicateScentIdException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity handlerDuplicateScentIdException(DuplicateScentIdException dsie){
-        ErrorDetail errorDetail = new ErrorDetail();
+    public ResponseEntity duplicate(RuntimeException re){
+        ErrorDetail errorDetail= new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
-        errorDetail.setCode(409);
-        errorDetail.setMessage(dsie.getMessage());
+        errorDetail.setCode(1002);
+        errorDetail.setMessage(re.getMessage());
         return new ResponseEntity(errorDetail, HttpStatus.CONFLICT);
     }
 }

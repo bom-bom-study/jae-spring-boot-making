@@ -1,6 +1,8 @@
 package me.jae57.woodywoody.repository;
 
+import me.jae57.woodywoody.exception.ScentNotFoundException;
 import me.jae57.woodywoody.model.Scent;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -28,15 +30,19 @@ public class ScentRepository {
 
     public Scent getScent(Long scentId) {
         String query = "SELECT * FROM scent WHERE scent_id=?";
-        return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
-                        .builder()
-                        .scentId(result.getLong("scent_id"))
-                        .scentName(result.getString("scent_name"))
-                        .scentKorName(result.getString("scent_kor_name"))
-                        .brand(result.getString("brand"))
-                        .fragrance(result.getString("fragrance"))
-                        .build()
-                , scentId);
+        try {
+            return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
+                            .builder()
+                            .scentId(result.getLong("scent_id"))
+                            .scentName(result.getString("scent_name"))
+                            .scentKorName(result.getString("scent_kor_name"))
+                            .brand(result.getString("brand"))
+                            .fragrance(result.getString("fragrance"))
+                            .build()
+                    , scentId);
+        }catch(EmptyResultDataAccessException e){
+            throw new ScentNotFoundException("scent not found");
+        }
     }
 
     public int getScentByName(String scentName) {

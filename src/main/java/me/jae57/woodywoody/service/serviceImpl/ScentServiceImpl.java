@@ -3,6 +3,8 @@ package me.jae57.woodywoody.service.serviceImpl;
 import me.jae57.woodywoody.dto.ReqScentDto;
 import me.jae57.woodywoody.dto.ScentDto;
 import me.jae57.woodywoody.exception.DuplicateScentIdException;
+import me.jae57.woodywoody.exception.EmptyDataException;
+import me.jae57.woodywoody.exception.FamilyNotFoundException;
 import me.jae57.woodywoody.exception.ScentNotFoundException;
 import me.jae57.woodywoody.model.Family;
 import me.jae57.woodywoody.model.Scent;
@@ -65,6 +67,11 @@ public class ScentServiceImpl implements ScentService {
 
     @Override
     public List<ScentDto> getAllScents() {
+        int stored = scentRepository.getCount();
+        if(stored == 0){
+            throw new EmptyDataException("There is no scent.");
+        }
+
         List<Scent> scents = scentRepository.getAllScents();
         return scents.stream().map(scent -> {
             Long scentId = scent.getScentId();
@@ -84,9 +91,14 @@ public class ScentServiceImpl implements ScentService {
     @Transactional
     @Override
     public List<ScentDto> getScentsByFamily(int familyId) {
+        int stored = familyRepository.getCountByFamilyId(familyId);
+        if(stored == 0){
+            throw new FamilyNotFoundException("family not found");
+        }
+
         int scentCount = scentFamilyRepository.getCountByFamilyId(familyId);
         if (scentCount == 0) {
-            // exception
+            throw new EmptyDataException("no scents for family-id("+familyId+")");
         }
         List<Long> scentIds = scentFamilyRepository.getScentsByFamilyId(familyId);
         return scentIds.stream().map(this::getScent).collect(Collectors.toList());
