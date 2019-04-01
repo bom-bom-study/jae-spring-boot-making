@@ -4,6 +4,7 @@ import lombok.*;
 
 @Builder
 @Getter
+@Setter
 public class Scent {
     private Long scentId;
     private String scentName;

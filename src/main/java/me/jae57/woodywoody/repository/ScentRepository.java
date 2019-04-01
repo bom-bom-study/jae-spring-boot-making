@@ -30,19 +30,15 @@ public class ScentRepository {
 
     public Scent getScent(Long scentId) {
         String query = "SELECT * FROM scent WHERE scent_id=?";
-        try {
-            return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
-                            .builder()
-                            .scentId(result.getLong("scent_id"))
-                            .scentName(result.getString("scent_name"))
-                            .scentKorName(result.getString("scent_kor_name"))
-                            .brand(result.getString("brand"))
-                            .fragrance(result.getString("fragrance"))
-                            .build()
-                    , scentId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new ScentNotFoundException("scent not found");
-        }
+        return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
+                        .builder()
+                        .scentId(result.getLong("scent_id"))
+                        .scentName(result.getString("scent_name"))
+                        .scentKorName(result.getString("scent_kor_name"))
+                        .brand(result.getString("brand"))
+                        .fragrance(result.getString("fragrance"))
+                        .build()
+                , scentId);
     }
 
     public int getScentByName(String scentName) {

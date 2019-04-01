@@ -12,11 +12,13 @@ import me.jae57.woodywoody.repository.FamilyRepository;
 import me.jae57.woodywoody.repository.ScentFamilyRepository;
 import me.jae57.woodywoody.repository.ScentRepository;
 import me.jae57.woodywoody.service.ScentService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,41 +40,24 @@ public class ScentServiceImpl implements ScentService {
     @Transactional
     @Override
     public void addScent(ReqScentDto reqScentDto) {
-        int stored = scentRepository.getScentByName(reqScentDto.getScentName());
-        if (stored > 0) {
-            throw new DuplicateScentIdException("The scent already exists : " + reqScentDto.getScentName());
-        } else {
-            int result = scentRepository.addScent(Scent
-                    .builder()
-                    .scentName(reqScentDto.getScentName())
-                    .scentKorName(reqScentDto.getScentKorName())
-                    .brand(reqScentDto.getBrand())
-                    .fragrance(reqScentDto.getFragrance())
-                    .build());
-            if (result == 0) {
-
-            } else {
-                List<String> families = reqScentDto.getFamilies();
-                Long scentId = scentRepository.getScentId(reqScentDto.getScentName());
-                for (String familyName : families) {
-                    int familyId = familyRepository.getFamilyId(familyName);
-                    int mappingResult = scentFamilyRepository.addScentFamily(scentId, familyId);
-                    if (mappingResult == 0) {
-
-                    }
-                }
-            }
+        scentRepository.addScent(Scent
+                .builder()
+                .scentName(reqScentDto.getScentName())
+                .scentKorName(reqScentDto.getScentKorName())
+                .brand(reqScentDto.getBrand())
+                .fragrance(reqScentDto.getFragrance())
+                .build());
+        List<String> families = reqScentDto.getFamilies();
+        Long scentId = scentRepository.getScentId(reqScentDto.getScentName());
+        for (String familyName : families) {
+            int familyId = Optional.ofNullable(familyRepository.getFamilyId(familyName)).orElseThrow(()->new FamilyNotFoundException("no family for family-name("+familyName+")"));
+            scentFamilyRepository.addScentFamily(scentId, familyId);
         }
     }
 
     @Override
     public List<ScentDto> getAllScents() {
-        int stored = scentRepository.getCount();
-        if (stored == 0) {
-            throw new EmptyDataException("There is no scent.");
-        }
-
-        List<Scent> scents = scentRepository.getAllScents();
+        List<Scent> scents = Optional.ofNullable(scentRepository.getAllScents()).orElseThrow(()->new EmptyDataException("There is no scent"));
         return scents.stream().map(scent -> {
             Long scentId = scent.getScentId();
             return getScent(scentId);
@@ -81,87 +66,59 @@ public class ScentServiceImpl implements ScentService {
 
     @Override
     public ScentDto getScent(Long scentId) {
-        Scent scent = scentRepository.getScent(scentId);
+        Scent scent = Optional.ofNullable(scentRepository.getScent(scentId)).orElseThrow(() -> new ScentNotFoundException("scent not found"));
         List<Integer> familyIds = scentFamilyRepository.getFamiliesByScentId(scentId);
-        List<Family> families = familyIds.stream().map(familyRepository::getFamilyById).collect(Collectors.toList());
+        List<Family> families = familyIds
+                .stream()
+                .map(id -> Optional.ofNullable(familyRepository.getFamilyById(id)).orElseThrow(() -> new FamilyNotFoundException("no family for family-id(" + id + ")")))
+                .collect(Collectors.toList());
         return ScentDto.from(scent, families);
     }
 
     @Override
     public List<ScentDto> getScentsByFamily(int familyId) {
-        int stored = familyRepository.getCountByFamilyId(familyId);
-        if (stored == 0) {
-            throw new FamilyNotFoundException("family not found");
-        }
+        List<Long> scentIds = Optional.ofNullable(scentFamilyRepository.getScentsByFamilyId(familyId))
+                .orElseThrow(() -> new EmptyDataException("no scent for family-id(" + familyId + ")"));
 
-        int scentCount = scentFamilyRepository.getCountByFamilyId(familyId);
-        if (scentCount == 0) {
-            throw new EmptyDataException("no scents for family-id(" + familyId + ")");
-        }
-        List<Long> scentIds = scentFamilyRepository.getScentsByFamilyId(familyId);
         return scentIds.stream().map(this::getScent).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public void updateScent(Long scentId, ReqScentDto reqScentDto) {
-        int stored = scentFamilyRepository.getCountByScentId(scentId);
-        if (stored == 0) {
-            throw new ScentNotFoundException("scent not found");
-        }
-
-        Set<Integer> oldFamilyIds = new HashSet<>(scentFamilyRepository.getFamiliesByScentId(scentId));
+        Set<Integer> oldFamilyIds = new HashSet<>(Optional.ofNullable(scentFamilyRepository.getFamiliesByScentId(scentId)).orElseThrow(()->new ScentNotFoundException("scent not found")));
         Set<Integer> newFamilyIds = familyNamesToIds(reqScentDto.getFamilies());
 
-        if (equalFamilies(oldFamilyIds, newFamilyIds)) {
+        if (notEqualFamilies(oldFamilyIds, newFamilyIds)) {
             scentFamilyRepository.deleteAllByScentId(scentId);
-            int result = scentFamilyRepository.getCountByScentId(scentId);
-            if (result == 0) {
-                for (Integer familyId : newFamilyIds) {
-                    scentFamilyRepository.addScentFamily(scentId, familyId);
-                }
-            } else {
-                //exception
+
+            for (Integer familyId : newFamilyIds) {
+                scentFamilyRepository.addScentFamily(scentId, familyId);
             }
         }
 
-        int result = scentRepository.updateScent(scentId, Scent
+        scentRepository.updateScent(scentId, Scent
                 .builder()
                 .scentName(reqScentDto.getScentName())
                 .scentKorName(reqScentDto.getScentKorName())
                 .brand(reqScentDto.getBrand())
                 .fragrance(reqScentDto.getFragrance())
                 .build());
-        if (result == 0) {
-            // throw exception
-        }
     }
 
     @Transactional
     @Override
     public void deleteScent(Long scentId) {
-        int stored = scentFamilyRepository.getCountByScentId(scentId);
-        if (stored == 0) {
-            throw new ScentNotFoundException("scent not found");
-        }
-
         scentFamilyRepository.deleteAllByScentId(scentId);
-        stored = scentFamilyRepository.getCountByScentId(scentId);
-        if (stored != 0) {
-            // exception
-        }
-        int result = scentRepository.deleteScent(scentId);
-        if (result == 0) {
-            // throw exception
-        }
+        scentRepository.deleteScent(scentId);
     }
 
     private Set<Integer> familyNamesToIds(List<String> families) {
         return families.stream().map(familyRepository::getFamilyId).collect(Collectors.toSet());
     }
 
-    private boolean equalFamilies(Set<Integer> familyOne, Set<Integer> familyTwo) {
-        return familyOne.containsAll(familyTwo) && familyTwo.containsAll(familyOne);
+    private boolean notEqualFamilies(Set<Integer> familyOne, Set<Integer> familyTwo) {
+        return ! (familyOne.containsAll(familyTwo) && familyTwo.containsAll(familyOne) );
     }
 
 }

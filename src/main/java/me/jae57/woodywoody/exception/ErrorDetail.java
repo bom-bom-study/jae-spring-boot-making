@@ -1,4 +1,4 @@
-package me.jae57.woodywoody.model;
+package me.jae57.woodywoody.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -10,7 +10,6 @@ import java.util.Date;
 @Setter
 public class ErrorDetail {
     private String message;
-    private int code;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Date timeStamp;
 }

@@ -1,10 +1,5 @@
 package me.jae57.woodywoody.exception;
 
-import me.jae57.woodywoody.exception.DuplicateScentIdException;
-import me.jae57.woodywoody.exception.EmptyDataException;
-import me.jae57.woodywoody.exception.FamilyNotFoundException;
-import me.jae57.woodywoody.exception.ScentNotFoundException;
-import me.jae57.woodywoody.model.ErrorDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,7 +16,6 @@ public class MyExceptionHandler {
     public ResponseEntity notFound(RuntimeException re) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
-        errorDetail.setCode(1002);
         errorDetail.setMessage(re.getMessage());
         return new ResponseEntity(errorDetail, HttpStatus.NOT_FOUND);
     }
@@ -31,7 +25,6 @@ public class MyExceptionHandler {
     public ResponseEntity duplicate(RuntimeException re) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
-        errorDetail.setCode(1002);
         errorDetail.setMessage(re.getMessage());
         return new ResponseEntity(errorDetail, HttpStatus.CONFLICT);
     }

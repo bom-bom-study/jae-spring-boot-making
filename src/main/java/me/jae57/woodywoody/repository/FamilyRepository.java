@@ -8,6 +8,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class FamilyRepository {
 
@@ -19,11 +21,7 @@ public class FamilyRepository {
 
     public int getFamilyId(String familyName) {
         String query = "SELECT family_id FROM family WHERE family_name=?";
-        try {
-            return jdbcTemplate.queryForObject(query, int.class, familyName);
-        } catch (EmptyResultDataAccessException e) {
-            throw new FamilyNotFoundException("family not found");
-        }
+        return jdbcTemplate.queryForObject(query, int.class, familyName);
     }
 
     public Family getFamilyById(int familyId) {
