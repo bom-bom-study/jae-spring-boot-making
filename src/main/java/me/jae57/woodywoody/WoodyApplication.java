@@ -1,13 +1,13 @@
-package me.jae57.datasource;
+package me.jae57.woodywoody;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DatasourceApplication {
+public class WoodyApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DatasourceApplication.class, args);
+        SpringApplication.run(WoodyApplication.class, args);
     }
 
 }
