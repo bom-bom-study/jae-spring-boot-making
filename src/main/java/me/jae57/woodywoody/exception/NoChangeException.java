@@ -1,8 +1,8 @@
 package me.jae57.woodywoody.exception;
 
-public class ScentNotFoundException extends RuntimeException {
+public class NoChangeException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-    public ScentNotFoundException(String message) {
+    public NoChangeException(String message) {
         super(message);
     }
 }

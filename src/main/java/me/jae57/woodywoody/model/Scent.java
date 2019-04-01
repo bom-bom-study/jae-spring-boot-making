@@ -5,6 +5,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode(exclude="scentId")
 public class Scent {
     private Long scentId;
     private String scentName;

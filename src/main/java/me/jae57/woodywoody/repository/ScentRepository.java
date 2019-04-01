@@ -1,7 +1,9 @@
 package me.jae57.woodywoody.repository;
 
+import me.jae57.woodywoody.exception.DuplicateScentIdException;
 import me.jae57.woodywoody.exception.ScentNotFoundException;
 import me.jae57.woodywoody.model.Scent;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -30,15 +32,19 @@ public class ScentRepository {
 
     public Scent getScent(Long scentId) {
         String query = "SELECT * FROM scent WHERE scent_id=?";
-        return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
-                        .builder()
-                        .scentId(result.getLong("scent_id"))
-                        .scentName(result.getString("scent_name"))
-                        .scentKorName(result.getString("scent_kor_name"))
-                        .brand(result.getString("brand"))
-                        .fragrance(result.getString("fragrance"))
-                        .build()
-                , scentId);
+        try{
+            return jdbcTemplate.queryForObject(query, (result, rowNum) -> Scent
+                            .builder()
+                            .scentId(result.getLong("scent_id"))
+                            .scentName(result.getString("scent_name"))
+                            .scentKorName(result.getString("scent_kor_name"))
+                            .brand(result.getString("brand"))
+                            .fragrance(result.getString("fragrance"))
+                            .build()
+                    , scentId);
+        }catch(EmptyResultDataAccessException e){
+            throw new ScentNotFoundException("scent not found for scent-id("+scentId+")");
+        }
     }
 
     public int getScentByName(String scentName) {
@@ -53,11 +59,15 @@ public class ScentRepository {
 
     public int addScent(Scent scent) {
         String query = "INSERT INTO scent(scent_name, scent_kor_name, brand, fragrance ) VALUES(?,?,?,?)";
-        return jdbcTemplate.update(query,
-                scent.getScentName(),
-                scent.getScentKorName(),
-                scent.getBrand(),
-                scent.getFragrance());
+        try{
+            return jdbcTemplate.update(query,
+                    scent.getScentName(),
+                    scent.getScentKorName(),
+                    scent.getBrand(),
+                    scent.getFragrance());
+        }catch(DataIntegrityViolationException e){
+            throw new DuplicateScentIdException("already exist scent with name("+scent.getScentName()+") and fragrance("+scent.getFragrance()+")");
+        }
     }
 
     public int updateScent(Long scentId, Scent scent) {

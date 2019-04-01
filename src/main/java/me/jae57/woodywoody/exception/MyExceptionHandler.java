@@ -4,28 +4,33 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Date;
 
 @ControllerAdvice
 public class MyExceptionHandler {
 
-    @ExceptionHandler({ScentNotFoundException.class, FamilyNotFoundException.class, EmptyDataException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity notFound(RuntimeException re) {
+    @ExceptionHandler({ScentNotFoundException.class, FamilyNotFoundException.class})
+    public ResponseEntity<ErrorDetail> notFound(RuntimeException re) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
         errorDetail.setMessage(re.getMessage());
-        return new ResponseEntity(errorDetail, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetail);
     }
 
     @ExceptionHandler(DuplicateScentIdException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity duplicate(RuntimeException re) {
+    public ResponseEntity<ErrorDetail> duplicateId(RuntimeException re) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date());
         errorDetail.setMessage(re.getMessage());
-        return new ResponseEntity(errorDetail, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDetail);
+    }
+
+    @ExceptionHandler(NoChangeException.class)
+    public ResponseEntity<ErrorDetail> noChange(RuntimeException re) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimeStamp(new Date());
+        errorDetail.setMessage(re.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(errorDetail);
     }
 }
